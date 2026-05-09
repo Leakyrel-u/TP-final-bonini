@@ -1,0 +1,16 @@
+[project]
+name = "optilens"
+version = "0.1.0"
+description = "Libreria de procesamiento de imágenes"
+readme = "README.md"
+authors = [
+    { name = "Jazmín Pineda", email = "jppinedac940@hotmail.com" },
+    { name = "Agustin Fernandez", email = "fernandezagustin744@gmail.com"},
+    { name = "Daniel Sanchez", email = "vidsar17@gmail.com"}
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.9.13,<0.10.0"]
+build-backend = "uv_build"
