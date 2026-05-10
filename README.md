@@ -1,16 +1,3 @@
-## Instalar uv
-
-En Windows:
-
-version 1
-```
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-version 2
-```
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.11.12/install.ps1 | iex"
-```
 
 # 📸 OptiLens - Librería de Procesamiento de Imágenes
 
@@ -36,6 +23,20 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.11.12/install.
 
 ## 📦 Instalación
 
+## Instalar uv
+
+En Windows:
+
+version 1
+```
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+version 2
+```
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.11.12/install.ps1 | iex"
+```
+
 ### Desde el repositorio (desarrollo)
 
 ```bash
@@ -44,4 +45,5 @@ git clone https://github.com/Leakyrel-u/TP-final-bonini.git
 cd optilens
 
 # Instalar en modo desarrollo
-pip install -e .
+uv pip install -e .
+```
