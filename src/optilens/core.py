@@ -13,12 +13,7 @@ class ProcesadorImagen:
     """
     Procesador de imágenes con capacidades de redimensionamiento,
     ajuste de brillo/contraste y marca de agua.
-    
-    Ejemplo:
-        >>> procesador = ProcesadorImagen()
-        >>> procesador.cargar_imagen("foto.jpg")
-        >>> procesador.redimensionar(800, 600)
-        >>> procesador.guardar_resultado()
+
     """
     
     def __init__(self, verbose=True):
@@ -30,12 +25,20 @@ class ProcesadorImagen:
         self.imagen_procesada = None
         self.nombre_archivo = ""
         self.verbose = verbose
-        
+    """
+    Este método funciona como un sistema de registro interno (o logger) encargado de 
+    centralizar y canalizar los mensajes informativos generados durante el ciclo de 
+    ejecución de la clase. Al recibir un mensaje, el método evalúa primero la bandera 
+    condicional self.verbose; si esta se encuentra activa (True), imprime el texto de manera 
+    inmediata en la consola o terminal estándar para ofrecer retroalimentación en tiempo real al usuario
+    """   
     def _log(self, mensaje):
         """Logger interno"""
         if self.verbose:
             print(mensaje)
         logger.info(mensaje)
+
+    
     
     def _verificar_imagen_cargada(self):
         """Verifica que haya una imagen cargada"""
@@ -61,7 +64,7 @@ class ProcesadorImagen:
         
         try:
             self.imagen_original = Image.open(ruta)
-            self.imagen_procesada = self.imagen_original.copy()
+            self.imagen_procesada = self.imagen_original.copy() # Realiza copia
             self.nombre_archivo = ruta.name
             self._log(f"✅ Imagen '{self.nombre_archivo}' cargada con éxito.")
         except Exception as e:
@@ -158,6 +161,35 @@ class ProcesadorImagen:
         
         return self
     
+     
+# Contraste y Saturación Generar una versión de alto contraste
+# y una de alta saturación de la misma imagen. 
+# Objetivo: distinguir la diferencia entre modificar la 
+# diferencia tonal vs. la viveza del color.
+# Métodos: ImageEnhance.Contrast, ImageEnhance.Color
+
+# Metodo contraste
+    def contraste(self, valor_contraste: float) -> "Tono":
+        self._image = ImageEnhance.Contrast(self._image).enhance(valor_contraste)
+        return self
+# Metodo saturacion
+    def saturacion(self, valor_saturacion:float) -> "Tono":
+        self._image = ImageEnhance.Color(self._image).enhance(valor_saturacion)
+        return self
+
+# Binariza la imagen evaluando cada píxel con una función lambda que asigna blanco (255)
+# si supera el valor umbral o negro (0) en caso contrario.    
+    def umbralizacion(self, valor_umbral): # Cambiamos el nombre aquí
+    # Ahora usamos 'valor_umbral' dentro del lambda
+        self._image = self._image.point(lambda x: 255 if x > valor_umbral else 0)
+    #El paso final .convert('1') simplemente compacta esa información al formato de 1 bit que buscabas.
+
+        self._image = self._image.convert('1')
+        return self
+    
+    ## Se guarda resultado 
+
+
     def guardar_resultado(self, carpeta_salida="procesadas", nombre=None, formato="WEBP"):
         """
         Guarda la imagen procesada.

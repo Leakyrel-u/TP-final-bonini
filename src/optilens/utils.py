@@ -4,6 +4,13 @@ import os
 from pathlib import Path
 from .exceptions import ParametroInvalidoError
 
+#Este módulo tiene como objetivo centralizar las funciones de soporte del sistema para verificar 
+# la existencia de rutas físicas y la correcta 
+# creación de directorios en el almacenamiento.
+# Asimismo, actúa como una capa de seguridad técnica que valida que los parámetros
+# numéricos de procesamiento se mantengan dentro de rangos seguros,
+# interrumpiendo la ejecución mediante excepciones personalizadas ante cualquier anomalía.
+
 def validar_ruta(ruta):
     """Valida que una ruta exista"""
     return Path(ruta).exists()
