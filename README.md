@@ -39,7 +39,31 @@
 * *Procesamiento de Imágenes:* [Pillow (PIL)](https://python-pillow.org)
 * *Gestión de Entorno y Paquetes:* [uv (Astral)](https://github.com/astral-sh/uv)
 
+## Instalación uv
+Windows:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+MacOS:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+## Configurar environment
+
+```bash
+uv venv
+```
+
+```bash
+uv sync
+```
+
 ## Funciones 
+
 El procesador ejecuta transformaciones controladas sobre los canales y matrices de la imagen:
 
 1. *Redimensionamiento Avanzado (ImageOps.fit):* Modifica las dimensiones geométricas de la imagen recortándola hacia el centro para encajar de forma exacta en el aspecto deseado. Utiliza el filtro de interpolación de alta calidad LANCZOS, reduciendo drásticamente el aliasing (efecto serrucho) en los bordes.
