@@ -23,18 +23,37 @@
 
 ## 📦 Instalación
 
-## Instalar uv
+## Instalación uv
+Windows:
 
-En Windows:
-
-version 1
-```
+```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-version 2
+MacOS:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.11.12/install.ps1 | iex"
+
+## Configurar environment
+
+```bash
+uv venv
+```
+
+```bash
+uv sync
+```
+
+## Configurar environment
+
+bash
+uv venv
+
+
+bash
+uv sync
 ```
 
 ### Desde el repositorio (desarrollo)
