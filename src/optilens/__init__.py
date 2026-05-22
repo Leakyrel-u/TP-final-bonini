@@ -1,14 +1,39 @@
 """
-OptiLens - Librería de procesamiento de imágenes
+OptiLens - Librería de procesamiento digital de imágenes
 """
 
 __version__ = "0.1.0"
 
 from .core import ProcesadorImagen
-from .exceptions import ImagenNoEncontradaError, ImagenNoCargadaError
+from .io import ImageIO
+from .exceptions import (
+    OptiLensError,
+    ImagenNoEncontradaError,
+    ImagenNoCargadaError,
+    ParametroInvalidoError,
+)
+from .transforms import (
+    BaseTransform,
+    ResizeTransform,
+    BrightnessTransform,
+    ContrastTransform,
+    SaturationTransform,
+    WatermarkTransform,
+    ThresholdTransform,
+)
 
 __all__ = [
     "ProcesadorImagen",
-    "ImagenNoEncontradaError", 
-    "ImagenNoCargadaError"
+    "ImageIO",
+    "OptiLensError",
+    "ImagenNoEncontradaError",
+    "ImagenNoCargadaError",
+    "ParametroInvalidoError",
+    "BaseTransform",
+    "ResizeTransform",
+    "BrightnessTransform",
+    "ContrastTransform",
+    "SaturationTransform",
+    "WatermarkTransform",
+    "ThresholdTransform",
 ]
