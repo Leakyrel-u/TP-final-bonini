@@ -12,7 +12,7 @@
 *Docente:* Juan Ignacio Bonini  
 *Integrantes del Equipo:*
 - Daniel Sanchez
-- Agustin 
+- Agustin Fernandez
 - Jazmin Pineda 
 
 ## Características
@@ -39,37 +39,21 @@
 * *Procesamiento de Imágenes:* [Pillow (PIL)](https://python-pillow.org)
 * *Gestión de Entorno y Paquetes:* [uv (Astral)](https://github.com/astral-sh/uv)
 
-## Instalación uv
-Windows:
-
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-MacOS:
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-## Configurar environment
-
-```bash
-uv venv
-```
-
-```bash
-uv sync
-```
-
-## Funciones 
-
+## Descripción de cada técnica aplicada y qué efecto produce. 
 El procesador ejecuta transformaciones controladas sobre los canales y matrices de la imagen:
 
 1. *Redimensionamiento Avanzado (ImageOps.fit):* Modifica las dimensiones geométricas de la imagen recortándola hacia el centro para encajar de forma exacta en el aspecto deseado. Utiliza el filtro de interpolación de alta calidad LANCZOS, reduciendo drásticamente el aliasing (efecto serrucho) en los bordes.
 2. *Ajuste de Brillo y Contraste Lineal (ImageEnhance):* Realza o disminuye la luminancia y el rango dinámico de los píxeles mapeando de forma matemática las matrices de color mediante un factor de escala.
 3. *Composición de Marca de Agua Alfa (Alpha Blending):* Convierte dinámicamente imágenes a espacio de color RGBA (Red, Green, Blue, Alpha) para incrustar logotipos comerciales con opacidad matemática transparente en coordenadas calculadas de la esquina inferior derecha.
 
+4. Contraste : Ajusta la diferencia entre tonos claros y oscuros de la imagen utilizando el módulo ImageEnhance.Contrast de Pillow según el factor numérico recibido.
+Modifica la imagen interna de forma directa y retorna la propia instancia de la clase para permitir el encadenamiento de métodos.
+
+5. Saturacion: Modifica la intensidad y vivacidad de los colores de la imagen mediante ImageEnhance.Color basándose en el parámetro flotante indicado.
+Actualiza el estado de la imagen actual y devuelve el objeto para continuar aplicando transformaciones en una sola línea de código.
+
+6. Umbralizacion: Binariza la imagen evaluando cada píxel con una función lambda que asigna blanco (255) si supera el valor umbral o negro (0) en caso contrario.
+Convierte el resultado final a formato de un solo bit (blanco y negro puro) y retorna la instancia modificada para seguir operando.
 
 ## Decisiones Técnicas y Arquitectura
 
@@ -91,3 +75,28 @@ PARCIAL/
 │   └── ejemplo.py         # Script de demostración de uso
 ├── pyproject.toml         # Configuración del proyecto y dependencias
 └── uv.lock                # Bloqueo de versiones de uv
+```
+
+## Instalación uv
+
+Windows:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+MacOS:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+## Configurar environment
+
+```bash
+uv venv
+```
+
+```bash
+uv sync
+```
