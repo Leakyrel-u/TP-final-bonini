@@ -1,5 +1,5 @@
 
-# Parcial Procesamiento de imágenes en el IFTS
+# TP Final Optilens
 ![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Status](https://img.shields.io/badge/status-en%20desarrollo-yellow)
