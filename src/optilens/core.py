@@ -14,6 +14,7 @@ from .transforms.contrast import ContrastTransform
 from .transforms.saturation import SaturationTransform
 from .transforms.watermark import WatermarkTransform
 from .transforms.threshold import ThresholdTransform
+from .transforms.pillow_filters import PillowFilterTransform
 
 logger = logging.getLogger(__name__)
 
