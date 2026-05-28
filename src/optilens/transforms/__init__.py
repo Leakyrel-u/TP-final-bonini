@@ -7,6 +7,9 @@ from .contrast import ContrastTransform
 from .saturation import SaturationTransform
 from .watermark import WatermarkTransform
 from .threshold import ThresholdTransform
+from .pillow_filters import PillowFilterTransform
+#from .Wiener import WienerRestorationTransform
+
 
 __all__ = [
     "BaseTransform",
@@ -16,4 +19,6 @@ __all__ = [
     "SaturationTransform",
     "WatermarkTransform",
     "ThresholdTransform",
+    "PillowFilterTransform"
+    "WienerRestorationTransform"
 ]
