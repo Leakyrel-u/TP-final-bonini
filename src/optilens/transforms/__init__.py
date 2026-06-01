@@ -9,7 +9,7 @@ from .watermark import WatermarkTransform
 from .threshold import ThresholdTransform
 from .pillow_filters import PillowFilterTransform
 #from .Wiener import WienerRestorationTransform
-
+from .fourier import FourierTransform
 
 __all__ = [
     "BaseTransform",
@@ -21,4 +21,6 @@ __all__ = [
     "ThresholdTransform",
     "PillowFilterTransform"
     "WienerRestorationTransform"
+    "fourierTransform"
 ]
+#
