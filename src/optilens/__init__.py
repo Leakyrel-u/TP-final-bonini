@@ -20,6 +20,7 @@ from .transforms import (
     SaturationTransform,
     WatermarkTransform,
     ThresholdTransform,
+    WienerRestorationTransform
 )
 
 __all__ = [
@@ -36,4 +37,5 @@ __all__ = [
     "SaturationTransform",
     "WatermarkTransform",
     "ThresholdTransform",
+    "WienerRestorationTransform"
 ]

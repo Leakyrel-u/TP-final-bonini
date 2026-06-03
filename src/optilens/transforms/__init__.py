@@ -8,7 +8,7 @@ from .saturation import SaturationTransform
 from .watermark import WatermarkTransform
 from .threshold import ThresholdTransform
 from .pillow_filters import PillowFilterTransform
-#from .Wiener import WienerRestorationTransform
+from .weiner_restoration import WienerRestorationTransform
 from .fourier import FourierTransform
 
 __all__ = [
@@ -19,8 +19,7 @@ __all__ = [
     "SaturationTransform",
     "WatermarkTransform",
     "ThresholdTransform",
-    "PillowFilterTransform"
-    "WienerRestorationTransform"
-    "fourierTransform"
+    "PillowFilterTransform",
+    "WienerRestorationTransform",
+    "FourierTransform"
 ]
-#
