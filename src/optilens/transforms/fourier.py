@@ -1,3 +1,4 @@
+from PIL import Image
 import numpy as np
 from .base import BaseTransform
 from typing import Literal
