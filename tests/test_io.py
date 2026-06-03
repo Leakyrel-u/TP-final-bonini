@@ -73,5 +73,41 @@ class TestImageIO(unittest.TestCase):
         with Image.open(ruta_resultado) as img:
             self.assertEqual(img.mode, "RGB")
 
+    def test_cargadores_concretos(self):
+        """Verifica el funcionamiento directo de CargadorLocal y CargadorUrl."""
+        from optilens.io import CargadorLocal, CargadorUrl
+        from optilens.exceptions import ParametroInvalidoError
+        
+        cargador_local = CargadorLocal()
+        img = cargador_local.cargar(self.sample_img_path)
+        self.assertEqual(img.size, (100, 100))
+        
+        cargador_url = CargadorUrl()
+        with self.assertRaises(ParametroInvalidoError):
+            cargador_url.cargar("ftp://servidor/imagen.png")
+
+    def test_guardadores_concretos(self):
+        """Verifica el funcionamiento directo de GuardadorLocal y GuardadorNube."""
+        from optilens.io import GuardadorLocal, GuardadorNube
+        from optilens.exceptions import ParametroInvalidoError
+        
+        # Guardador Local
+        guardador_local = GuardadorLocal()
+        ruta_guardado = self.test_dir / "guardado_directo_local.png"
+        res_local = guardador_local.guardar(self.sample_image, ruta_guardado, formato="PNG")
+        self.assertTrue(Path(res_local).exists())
+        
+        with self.assertRaises(ParametroInvalidoError):
+            guardador_local.validar("http://google.com/img.png")
+            
+        # Guardador Nube
+        guardador_nube = GuardadorNube()
+        url_valida = "https://nube.com/mi_foto.jpg"
+        res_nube = guardador_nube.guardar(self.sample_image, url_valida, formato="JPEG")
+        self.assertEqual(res_nube, url_valida)
+        
+        with self.assertRaises(ParametroInvalidoError):
+            guardador_nube.validar(self.test_dir / "local.png")
+
 if __name__ == '__main__':
     unittest.main()

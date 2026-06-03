@@ -51,7 +51,7 @@ class TestProcesadorImagen(unittest.TestCase):
         salida_dir = self.test_dir / "salida_final"
         
         # Ejecutar pipeline encadenado
-        ruta_salida = (
+        res = (
             self.procesador
             .cargar_imagen(self.img_path)
             .redimensionar(50, 50)
@@ -62,7 +62,9 @@ class TestProcesadorImagen(unittest.TestCase):
             .guardar_resultado(carpeta_salida=salida_dir, nombre="pajaro_editado.webp", formato="WEBP")
         )
         
-        self.assertTrue(Path(ruta_salida).exists())
+        self.assertEqual(res, self.procesador)
+        self.assertIsNotNone(self.procesador.ultimo_guardado)
+        self.assertTrue(Path(self.procesador.ultimo_guardado).exists())
         self.assertEqual(self.procesador.imagen_procesada.size, (50, 50))
         
     def test_alias_contraste(self):
@@ -99,6 +101,53 @@ class TestProcesadorImagen(unittest.TestCase):
         # Verificar que el canal R y B se hayan invertido
         self.assertEqual(pixel_procesado[0], pixel_original[2])
         self.assertEqual(pixel_procesado[2], pixel_original[0])
+
+    def test_guardar_nube_exito(self):
+        """Verifica que se pueda guardar en la nube simulando la carga a una URL y validando."""
+        self.procesador.cargar_imagen(self.img_path)
+        url_nube = "https://mi-storage.com/imagenes/pajaro.jpg"
+        
+        res = self.procesador.guardar_resultado(destino=url_nube)
+        
+        self.assertEqual(res, self.procesador)
+        self.assertEqual(self.procesador.ultimo_guardado, url_nube)
+
+    def test_guardar_nube_url_invalida(self):
+        """Verifica que guardar con una URL de nube inválida lance ParametroInvalidoError."""
+        from optilens.exceptions import ParametroInvalidoError
+        self.procesador.cargar_imagen(self.img_path)
+        
+        with self.assertRaises(ParametroInvalidoError):
+            self.procesador.guardar_resultado(destino="ftp://servidor.com/img.jpg")
+
+    def test_guardar_local_ruta_invalida(self):
+        """Verifica que guardar localmente con una ruta que es URL lance ParametroInvalidoError."""
+        from optilens.exceptions import ParametroInvalidoError
+        from optilens.io import GuardadorLocal
+        self.procesador.cargar_imagen(self.img_path)
+        
+        with self.assertRaises(ParametroInvalidoError):
+            self.procesador.guardar_resultado(destino="https://servidor.local/img.jpg", guardador=GuardadorLocal())
+
+    def test_cargar_imagen_desde_url(self):
+        """Verifica que se pueda cargar una imagen desde una URL usando CargadorUrl y mockeando la red."""
+        from unittest.mock import patch, MagicMock
+        import io
+        
+        with patch('urllib.request.urlopen') as mock_urlopen:
+            mock_response = MagicMock()
+            img_bytes = io.BytesIO()
+            Image.new("RGB", (10, 10), color="red").save(img_bytes, format="PNG")
+            img_bytes.seek(0)
+            
+            mock_response.read.return_value = img_bytes.read()
+            mock_urlopen.return_value.__enter__.return_value = mock_response
+            
+            url = "https://ejemplo.com/imagenes/mi_foto.png"
+            self.procesador.cargar_imagen(url)
+            
+            self.assertEqual(self.procesador.nombre_archivo, "mi_foto.png")
+            self.assertEqual(self.procesador.imagen_procesada.size, (10, 10))
 
 if __name__ == '__main__':
     unittest.main()

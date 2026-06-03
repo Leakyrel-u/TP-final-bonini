@@ -5,8 +5,16 @@ from pathlib import Path
 from typing import Union, Optional, List
 from PIL import Image
 
-from .exceptions import ImagenNoCargadaError
-from .io import ImageIO
+from .exceptions import ImagenNoCargadaError, ParametroInvalidoError
+from .io import (
+    ImageIO,
+    CargadorImagen,
+    CargadorLocal,
+    CargadorUrl,
+    GuardadorImagen,
+    GuardadorLocal,
+    GuardadorNube,
+)
 from .transforms.base import BaseTransform
 from .transforms.resize import ResizeTransform
 from .transforms.brightness import BrightnessTransform
@@ -39,6 +47,7 @@ class ProcesadorImagen:
         self.imagen_procesada: Optional[Image.Image] = None
         self.nombre_archivo: str = ""
         self.verbose: bool = verbose
+        self.ultimo_guardado: Optional[str] = None
         self._pipeline: List[BaseTransform] = []
 
     """
@@ -78,24 +87,43 @@ class ProcesadorImagen:
                 "No hay imagen cargada. Usa cargar_imagen() primero."
             )
 
-    def cargar_imagen(self, ruta_acceso: Union[str, Path]) -> "ProcesadorImagen":
+    def cargar_imagen(
+        self,
+        ruta_acceso: Union[str, Path],
+        cargador: Optional[CargadorImagen] = None
+    ) -> "ProcesadorImagen":
         """
-        Carga una imagen desde el sistema de archivos de forma no destructiva.
+        Carga una imagen desde el sistema de archivos o una URL de forma no destructiva.
 
         Args:
-            ruta_acceso (Union[str, Path]): Ruta al archivo de imagen.
+            ruta_acceso (Union[str, Path]): Ruta al archivo de imagen o URL.
+            cargador (Optional[CargadorImagen]): Instancia del cargador a utilizar. Si es None, se autodetecta.
 
         Returns:
             ProcesadorImagen: La propia instancia para encadenamiento.
 
         Raises:
-            ImagenNoEncontradaError: Si la ruta no existe o es ilegible.
+            ImagenNoEncontradaError: Si la ruta/URL no existe o es ilegible.
         """
-        self.imagen_original = ImageIO.cargar(ruta_acceso)
-        self.imagen_procesada = (
-            self.imagen_original.copy()
-        )  # Realiza copia no destructiva
-        self.nombre_archivo = Path(ruta_acceso).name
+        if cargador is None:
+            ruta_str = str(ruta_acceso)
+            if ruta_str.startswith(("http://", "https://")):
+                cargador = CargadorUrl()
+            else:
+                cargador = CargadorLocal()
+
+        self.imagen_original = cargador.cargar(ruta_acceso)
+        self.imagen_procesada = self.imagen_original.copy()  # Realiza copia no destructiva
+        
+        # Extraer el nombre del archivo
+        ruta_str = str(ruta_acceso)
+        if ruta_str.startswith(("http://", "https://")):
+            from urllib.parse import urlparse
+            path_parsed = urlparse(ruta_str).path
+            self.nombre_archivo = Path(path_parsed).name or "imagen_url.jpg"
+        else:
+            self.nombre_archivo = Path(ruta_acceso).name
+            
         self._pipeline.clear()
         self._log(f"✅ Imagen '{self.nombre_archivo}' cargada con éxito.")
         return self
@@ -228,33 +256,59 @@ class ProcesadorImagen:
 
     def guardar_resultado(
         self,
+        destino: Optional[Union[str, Path]] = None,
+        guardador: Optional[GuardadorImagen] = None,
         carpeta_salida: Union[str, Path] = "procesadas",
         nombre: Optional[str] = None,
         formato: str = "JPEG",
-    ) -> str:
+    ) -> "ProcesadorImagen":
         """
-        Guarda la imagen procesada en disco.
+        Guarda la imagen procesada. Permite guardar de manera flexible en el disco duro
+        local o en la nube mediante inyección de guardadores.
 
         Args:
-            carpeta_salida (Union[str, Path]): Directorio de destino.
-            nombre (Optional[str]): Nombre de archivo final personalizado.
+            destino (Optional[Union[str, Path]]): Ruta o URL de destino final. Si es None, se autogenera localmente.
+            guardador (Optional[GuardadorImagen]): Instancia del guardador a utilizar. Si es None, se autodetecta.
+            carpeta_salida (Union[str, Path]): Carpeta de destino (solo si destino es None).
+            nombre (Optional[str]): Nombre de archivo personalizado (solo si destino es None).
             formato (str): Formato del archivo resultante (WEBP, JPEG, PNG).
 
         Returns:
-            str: Ruta final del archivo guardado.
+            ProcesadorImagen: La propia instancia para encadenamiento.
         """
         self._verificar_imagen_cargada()
         assert self.imagen_procesada is not None  # type safety
 
-        ruta_final = ImageIO.guardar(
-            self.imagen_procesada,
-            carpeta_salida=carpeta_salida,
-            nombre=nombre,
-            formato=formato,
-            nombre_original=self.nombre_archivo,
+        # Determinar el guardador y el destino final
+        if destino is None:
+            formato_upper = formato.upper()
+            if nombre is None:
+                nombre_base = Path(self.nombre_archivo).stem
+                ext = "jpg" if formato_upper in ["JPEG", "JPG"] else formato_upper.lower()
+                nombre = f"{nombre_base}_editada.{ext}"
+            destino_final: Union[str, Path] = Path(carpeta_salida) / nombre
+            if guardador is None:
+                guardador = GuardadorLocal()
+        else:
+            destino_final = destino
+            if guardador is None:
+                destino_str = str(destino_final)
+                if destino_str.startswith(("http://", "https://")):
+                    guardador = GuardadorNube()
+                else:
+                    guardador = GuardadorLocal()
+
+        # Guardar la imagen con el guardador seleccionado
+        ruta_guardada = guardador.guardar(
+            imagen=self.imagen_procesada,
+            destino=destino_final,
+            formato=formato
         )
-        self._log(f"💾 Guardado en: {ruta_final}")
-        return str(ruta_final)
+        
+        # Guardar en el atributo la ruta/URL resultante
+        self.ultimo_guardado = ruta_guardada
+        self._log(f"💾 Guardado en: {ruta_guardada}")
+        return self
 
     def resetear(self) -> "ProcesadorImagen":
         """
