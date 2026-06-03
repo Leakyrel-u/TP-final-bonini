@@ -12,5 +12,4 @@ proc.contraste(.5).guardar_resultado(nombre="pajaro_contraste.jpg")
 proc.umbralizacion(2).guardar_resultado(nombre="pajaro_umbralizacion.jpg")
 proc.guardar_resultado()
 
-
-# proc.contraste(.5).umbralizacion(2).guardar_resultado(nombre="pajaro_contraste-umbralizacion.jpg")
+proc.contraste(.5).umbralizacion(2).guardar_resultado(nombre="pajaro_contraste-umbralizacion.jpg")

@@ -26,5 +26,13 @@ class BrightnessTransform(BaseTransform):
         Returns:
             Image.Image: Nueva imagen con brillo ajustado.
         """
+        original_mode = imagen.mode
+        if original_mode == "1":
+            imagen = imagen.convert("L")
+
         realzador = ImageEnhance.Brightness(imagen)
-        return realzador.enhance(self.factor)
+        resultado = realzador.enhance(self.factor)
+
+        if original_mode == "1":
+            resultado = resultado.convert("1")
+        return resultado

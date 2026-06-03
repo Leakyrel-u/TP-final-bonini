@@ -38,10 +38,11 @@ class ProcesadorImagen:
       modulares.
     """
 
-    def __init__(self, verbose: bool = True):
+    def __init__(self, verbose: bool = True, max_cambios: int = 5):
         """
         Args:
             verbose (bool): Si True, imprime mensajes de progreso en la consola.
+            max_cambios (int): Máximo de cambios a guardar para deshacer/rehacer.
         """
         self.imagen_original: Optional[Image.Image] = None
         self.imagen_procesada: Optional[Image.Image] = None
@@ -49,6 +50,9 @@ class ProcesadorImagen:
         self.verbose: bool = verbose
         self.ultimo_guardado: Optional[str] = None
         self._pipeline: List[BaseTransform] = []
+        self.max_cambios: int = max_cambios
+        self._historial_deshacer: List[tuple[Image.Image, List[BaseTransform]]] = []
+        self._historial_rehacer: List[tuple[Image.Image, List[BaseTransform]]] = []
 
     """
     Este método funciona como un sistema de registro interno (o logger) encargado de 
@@ -125,6 +129,8 @@ class ProcesadorImagen:
             self.nombre_archivo = Path(ruta_acceso).name
             
         self._pipeline.clear()
+        self._historial_deshacer.clear()
+        self._historial_rehacer.clear()
         self._log(f"✅ Imagen '{self.nombre_archivo}' cargada con éxito.")
         return self
 
@@ -143,6 +149,12 @@ class ProcesadorImagen:
         """
         self._verificar_imagen_cargada()
         assert self.imagen_procesada is not None  # type safety para linters
+
+        # Guardar copia del estado actual en el historial de deshacer antes del cambio
+        self._historial_deshacer.append((self.imagen_procesada.copy(), list(self._pipeline)))
+        if len(self._historial_deshacer) > self.max_cambios:
+            self._historial_deshacer.pop(0)
+        self._historial_rehacer.clear()
 
         self.imagen_procesada = transformacion.apply(self.imagen_procesada)
         self._pipeline.append(transformacion)
@@ -320,5 +332,57 @@ class ProcesadorImagen:
         if self.imagen_original:
             self.imagen_procesada = self.imagen_original.copy()
             self._pipeline.clear()
+            self._historial_deshacer.clear()
+            self._historial_rehacer.clear()
             self._log("🔄 Imagen restaurada al original")
+        return self
+
+    def deshacer(self) -> "ProcesadorImagen":
+        """
+        Deshace el último cambio aplicado, volviendo al estado anterior del historial.
+
+        Returns:
+            ProcesadorImagen: La propia instancia para encadenamiento.
+        """
+        self._verificar_imagen_cargada()
+        if not self._historial_deshacer:
+            self._log("⚠️ No hay cambios para deshacer.")
+            return self
+
+        assert self.imagen_procesada is not None
+        # Guardar estado actual en rehacer
+        self._historial_rehacer.append((self.imagen_procesada.copy(), list(self._pipeline)))
+        if len(self._historial_rehacer) > self.max_cambios:
+            self._historial_rehacer.pop(0)
+
+        # Restaurar estado anterior
+        imagen_anterior, pipeline_anterior = self._historial_deshacer.pop()
+        self.imagen_procesada = imagen_anterior
+        self._pipeline = pipeline_anterior
+        self._log("🔄 Cambio deshecho.")
+        return self
+
+    def rehacer(self) -> "ProcesadorImagen":
+        """
+        Rehace el último cambio deshecho.
+
+        Returns:
+            ProcesadorImagen: La propia instancia para encadenamiento.
+        """
+        self._verificar_imagen_cargada()
+        if not self._historial_rehacer:
+            self._log("⚠️ No hay cambios para rehacer.")
+            return self
+
+        assert self.imagen_procesada is not None
+        # Guardar estado actual en deshacer
+        self._historial_deshacer.append((self.imagen_procesada.copy(), list(self._pipeline)))
+        if len(self._historial_deshacer) > self.max_cambios:
+            self._historial_deshacer.pop(0)
+
+        # Restaurar estado deshecho
+        imagen_siguiente, pipeline_siguiente = self._historial_rehacer.pop()
+        self.imagen_procesada = imagen_siguiente
+        self._pipeline = pipeline_siguiente
+        self._log("🔄 Cambio rehecho.")
         return self

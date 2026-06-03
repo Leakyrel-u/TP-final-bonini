@@ -26,5 +26,13 @@ class ContrastTransform(BaseTransform):
         Returns:
             Image.Image: Nueva imagen con contraste ajustado.
         """
+        original_mode = imagen.mode
+        if original_mode == "1":
+            imagen = imagen.convert("L")
+
         realzador = ImageEnhance.Contrast(imagen)
-        return realzador.enhance(self.factor)
+        resultado = realzador.enhance(self.factor)
+
+        if original_mode == "1":
+            resultado = resultado.convert("1")
+        return resultado
