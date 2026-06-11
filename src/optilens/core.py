@@ -5,9 +5,8 @@ from pathlib import Path
 from typing import Union, Optional, List
 from PIL import Image
 
-from .exceptions import ImagenNoCargadaError, ParametroInvalidoError
+from .exceptions import ImagenNoCargadaError
 from .io import (
-    ImageIO,
     CargadorImagen,
     CargadorLocal,
     CargadorUrl,

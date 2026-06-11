@@ -8,6 +8,6 @@ Integración y Encadenamiento en ProcesadorImagen:Se cambia core.py para utiliza
 Actualiza guardar_resultado para que retorne self (permitiendo chaining completo) y registre la ubicación final en el atributo ultimo_guardado.
 El archivo  init.py  para exportar las nuevas clases de forma pública.
 
-Pruebas y Verificación:
+## Pruebas y Verificación:
 Se añade validación de cargas simuladas de red, guardado en nube e invalidación de formatos a nivel local/remoto en test_core.py  y test_io.py.
 Se verifica la suite completa de 22 pruebas con éxito, y comprueba que los ejemplos integrales se ejecutan correctamente.

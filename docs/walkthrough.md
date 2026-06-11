@@ -1,6 +1,6 @@
 # Resumen del Trabajo Realizado (Git Commit Walkthrough)
 
-Hemos organizado exitosamente tus **21 archivos modificados/creados** en **5 commits independientes y lógicos**. En cada etapa se verificó de manera aislada e incremental que el código compilase y que toda la suite de pruebas unitarias (16 pruebas) pasara perfectamente.
+Se organizo exitosamente tus **21 archivos modificados/creados** en **5 commits independientes y lógicos**. En cada etapa se verificó de manera aislada e incremental que el código compilase y que toda la suite de pruebas unitarias (16 pruebas) pasara perfectamente.
 
 El árbol de cambios en Git quedó estructurado de la siguiente manera:
 

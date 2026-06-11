@@ -8,7 +8,7 @@ Se aplica el ajuste de contraste secuencial sobre los píxeles de la imagen resu
 3. Aplicar el mismo filtro múltiples veces y combinaciones sin generar error.
 Para garantizar que se puedan realizar cualquier tipo de combinaciones (como aplicar contraste, ajustar_brillo o saturacion después de una binarización umbralizacion), se modificaron las transformaciones para que conviertan temporalmente la imagen de modo 1 a L antes de la operación de realce, y la regresen a modo 1 al finalizar. De esta manera, ninguna combinación de filtros genera errores de modo de imagen.
 
-Para implementar estos cambios y que no afecte el proceso se implementa los siguientes métodos
+* Para implementar estos cambios y que no afecte el proceso se implementa los siguientes métodos
 
 Historial de Cambios en Memoria (Deshacer/Rehacer):
 Se añadió el parámetro max_cambios: int = 5 al inicializador de 
@@ -17,7 +17,6 @@ ProcesadorImagen
 * Se implementaron los métodos deshacer()  y r ehacer(): El historial se borra al cargar una nueva imagen (cargar_imagen) o reiniciar la imagen (resetear).
 Compatibilidad en Transformaciones: Modificación de contrast.py / brightness.py  y saturation.py para tolerar y preservar el modo 1.
 
-Pruebas y Ejemplos:
-Se agregaron pruebas unitarias específicas en test_history.py y se agrega el archivo  test_all_features.py
- para que cubra todas las funcionalidades (incluyendo deshacer, rehacer, doble contraste, doble umbralización y combinaciones en modo 1).
+## Pruebas y Ejemplos:
+Se agregaron pruebas unitarias específicas en test_history.py y se agrega el archivo  test_all_features.py para que cubra todas las funcionalidades (incluyendo deshacer, rehacer, doble contraste, doble umbralización y combinaciones en modo 1).
 
