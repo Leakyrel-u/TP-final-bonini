@@ -9,10 +9,16 @@ proc.ajustar_brillo(1.5)
 ruta = r"marca.png"
 proc.aplicar_marca_agua(ruta_logo=ruta)
 proc.contraste(.5).guardar_resultado(nombre="pajaro_contraste.jpg")
-proc.umbralizacion(2).guardar_resultado(nombre="pajaro_umbralizacion.jpg")
-proc.guardar_resultado()
 
-proc.contraste(.5).umbralizacion(2).guardar_resultado(nombre="pajaro_contraste-umbralizacion.jpg")
+proc = ProcesadorImagen()
+proc.cargar_imagen("pajaro.jpg")
+
+proc.ajustar_brillo(1.5) \
+        .contraste(1.2) \
+        .saturacion(0.8) \
+        .redimensionar(200, 200)
+    
+proc.guardar_resultado(nombre="pajaro_binarizado_y_procesado.png", formato="PNG")
 
 # --- Ejemplos de uso de GuardadorNube ---
 print("\n--- Ejemplos de Guardado en la Nube (Simulado) ---")
