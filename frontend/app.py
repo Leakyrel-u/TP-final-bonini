@@ -14,40 +14,51 @@ if str(SRC) not in sys.path:
 
 from optilens import ProcesadorImagen
 
-st.set_page_config(page_title="OptiLens UI", page_icon="🖼️", layout="wide")
+st.set_page_config(
+    page_title="OptiLens UI",
+    page_icon="🖼️",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 st.markdown(
     """
     <style>
     .block-container {
-        padding-top: 1.5rem;
-        padding-bottom: 2rem;
-        max-width: 1400px;
+        padding-top: 1rem;
+        padding-bottom: 1.5rem;
+        max-width: 1500px;
     }
     .hero {
-        background: linear-gradient(90deg, #0f172a 0%, #2563eb 100%);
-        color: white;
-        padding: 1.2rem 1.4rem;
-        border-radius: 14px;
-        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 48%, #dbeafe 100%);
+        color: #0f172a;
+        padding: 1rem 1.2rem;
+        border-radius: 16px;
+        margin-bottom: 0.8rem;
+        border: 1px solid #bfdbfe;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
     }
     .hero h1 {
-        margin: 0 0 0.3rem 0;
-        font-size: 1.8rem;
+        margin: 0 0 0.25rem 0;
+        font-size: 1.7rem;
     }
     .hero p {
         margin: 0;
-        opacity: 0.95;
+        opacity: 0.9;
     }
     div[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
+        width: 380px !important;
+        min-width: 320px !important;
     }
     .status-card {
         background: #f8fafc;
+        color: #0f172a;
         border: 1px solid #dbeafe;
         border-radius: 12px;
-        padding: 0.8rem 1rem;
-        margin-bottom: 1rem;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 0.7rem;
+        font-weight: 600;
     }
     </style>
     """,
@@ -179,10 +190,10 @@ with st.sidebar:
 main_col_left, main_col_right = st.columns(2)
 with main_col_left:
     st.markdown('<div class="status-card"><strong>Original</strong></div>', unsafe_allow_html=True)
-    st.image(st.session_state.original_image, use_column_width=True)
+    st.image(st.session_state.original_image, width="stretch")
 with main_col_right:
     st.markdown('<div class="status-card"><strong>Vista previa actual</strong></div>', unsafe_allow_html=True)
-    st.image(st.session_state.current_image, use_column_width=True)
+    st.image(st.session_state.current_image, width="stretch")
 
 buffer = BytesIO()
 st.session_state.current_image.save(buffer, format="PNG")
