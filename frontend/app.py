@@ -15,7 +15,7 @@ if str(SRC) not in sys.path:
 from optilens import ProcesadorImagen
 
 st.set_page_config(
-    page_title="OptiLens UI",
+    page_title="OptiLens Studio",
     page_icon="🖼️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -24,41 +24,104 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+    html, body, [data-testid="stAppViewContainer"] {
+        background: #1e1e1e;
+        color: #d4d4d4;
+    }
+    [data-testid="stHeader"] {
+        display: none;
+    }
     .block-container {
-        padding-top: 1rem;
-        padding-bottom: 1.5rem;
-        max-width: 1500px;
+        padding-top: 0.4rem;
+        padding-bottom: 0.6rem;
+        max-width: 1600px;
     }
-    .hero {
-        background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 48%, #dbeafe 100%);
-        color: #0f172a;
-        padding: 1rem 1.2rem;
-        border-radius: 16px;
-        margin-bottom: 0.8rem;
-        border: 1px solid #bfdbfe;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    [data-testid="stSidebar"] {
+        background: #252526;
+        border-right: 1px solid #3c3c3c;
+        width: 330px !important;
+        min-width: 300px !important;
     }
-    .hero h1 {
-        margin: 0 0 0.25rem 0;
-        font-size: 1.7rem;
+    [data-testid="stSidebar"] .block-container {
+        padding-top: 0.3rem;
+        padding-bottom: 0.2rem;
     }
-    .hero p {
-        margin: 0;
-        opacity: 0.9;
-    }
-    div[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
-        width: 380px !important;
-        min-width: 320px !important;
-    }
-    .status-card {
-        background: #f8fafc;
-        color: #0f172a;
-        border: 1px solid #dbeafe;
+    .topbar {
+        background: linear-gradient(90deg, #2d2d30 0%, #252526 100%);
+        border: 1px solid #3c3c3c;
         border-radius: 12px;
-        padding: 0.7rem 0.9rem;
-        margin-bottom: 0.7rem;
+        padding: 0.75rem 0.9rem;
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .topbar-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+    .topbar-subtitle {
+        font-size: 0.85rem;
+        color: #9cdcfe;
+    }
+    .panel {
+        background: #252526;
+        border: 1px solid #3c3c3c;
+        border-radius: 12px;
+        padding: 0.6rem 0.75rem;
+        margin-bottom: 0.55rem;
+    }
+    .toolbar {
+        background: #2d2d30;
+        border: 1px solid #3c3c3c;
+        border-radius: 10px;
+        padding: 0.35rem;
+        margin-bottom: 0.55rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        align-items: center;
+    }
+    .toolbar .stButton > button {
+        margin: 0;
+        width: 100%;
+        min-height: 2.2rem;
+    }
+    .preview-card {
+        background: #1e1e1e;
+        border: 1px solid #3c3c3c;
+        border-radius: 10px;
+        padding: 0.45rem 0.65rem;
+        margin-bottom: 0.4rem;
+        color: #d4d4d4;
         font-weight: 600;
+    }
+    .stButton > button {
+        background: #0e639c;
+        color: white;
+        border: 1px solid #1177b0;
+        border-radius: 8px;
+        height: 2.1rem;
+        padding: 0 0.7rem;
+    }
+    .stButton > button:hover {
+        background: #1177b0;
+        border-color: #1691d0;
+    }
+    .stDownloadButton > button {
+        background: #2f6f3e;
+        border-color: #3a874c;
+    }
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div > div,
+    .stNumberInput > div > div > input {
+        background: #3c3c3c;
+        color: #ffffff;
+        border: 1px solid #4f4f4f;
+    }
+    .stSlider > div[data-testid="stTickBarMin"] {
+        color: #d4d4d4;
     }
     </style>
     """,
@@ -67,9 +130,12 @@ st.markdown(
 
 st.markdown(
     """
-    <div class="hero">
-        <h1>OptiLens Studio</h1>
-        <p>Aplica transformaciones a tus imágenes de forma visual, ordenada y con historial de cambios.</p>
+    <div class="topbar">
+        <div>
+            <div class="topbar-title">OptiLens Studio</div>
+            <div class="topbar-subtitle">Editor visual para procesamiento de imágenes</div>
+        </div>
+        <div class="topbar-subtitle">Streamlit · VS Code style</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -85,15 +151,12 @@ if "uploaded_name" not in st.session_state:
     st.session_state.uploaded_name = None
 if "temp_dir" not in st.session_state:
     st.session_state.temp_dir = None
+if "last_action" not in st.session_state:
+    st.session_state.last_action = "Esperando imagen..."
 
 with st.sidebar:
-    st.header("Controles")
-    st.caption("Sube una imagen y elige qué transformaciones aplicar.")
-
-    uploaded_file = st.file_uploader(
-        "1. Selecciona una imagen",
-        type=["png", "jpg", "jpeg", "webp"],
-    )
+    st.markdown('<div class="panel"><strong>Explorer</strong></div>', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("Abrir imagen", type=["png", "jpg", "jpeg", "webp"])
 
     if uploaded_file is not None and uploaded_file.name != st.session_state.uploaded_name:
         temp_dir = Path(tempfile.mkdtemp(dir=str(ROOT / "frontend")))
@@ -108,27 +171,19 @@ with st.sidebar:
         st.session_state.original_image = proc.imagen_original.copy()
         st.session_state.uploaded_name = uploaded_file.name
         st.session_state.temp_dir = temp_dir
+        st.session_state.last_action = "Imagen cargada"
 
-    if st.session_state.processor is None:
-        st.info("Carga una imagen para comenzar.")
-        st.stop()
-
-    st.divider()
-    st.subheader("2. Transformaciones")
-
+    st.markdown('<div class="panel"><strong>Transformaciones</strong></div>', unsafe_allow_html=True)
     aplicar_brillo = st.checkbox("Brillo", value=True)
     aplicar_contraste = st.checkbox("Contraste", value=True)
     aplicar_saturacion = st.checkbox("Saturación", value=True)
     aplicar_umbral = st.checkbox("Binarización", value=True)
     aplicar_redimension = st.checkbox("Redimensionado", value=True)
 
-    with st.expander("Opciones adicionales", expanded=False):
+    with st.expander("Más opciones", expanded=False):
         aplicar_marca = st.checkbox("Marca de agua", value=False)
         if aplicar_marca:
-            logo_file = st.file_uploader(
-                "Logo para marca de agua",
-                type=["png", "jpg", "jpeg", "webp"],
-            )
+            logo_file = st.file_uploader("Logo", type=["png", "jpg", "jpeg", "webp"])
             opacidad = st.slider("Opacidad", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
             escala = st.slider("Escala", min_value=0.05, max_value=0.5, value=0.25, step=0.01)
         else:
@@ -136,8 +191,7 @@ with st.sidebar:
             opacidad = 0.5
             escala = 0.25
 
-    st.divider()
-    st.subheader("3. Ajustes")
+    st.markdown('<div class="panel"><strong>Ajustes</strong></div>', unsafe_allow_html=True)
     brillo = st.slider("Brillo", min_value=0.5, max_value=2.0, value=1.0, step=0.1)
     contraste = st.slider("Contraste", min_value=0.5, max_value=2.0, value=1.0, step=0.1)
     saturacion = st.slider("Saturación", min_value=0.0, max_value=2.0, value=1.0, step=0.1)
@@ -145,60 +199,79 @@ with st.sidebar:
     alto = st.number_input("Alto", min_value=100, max_value=4000, value=600, step=10)
     umbral = st.slider("Umbral", min_value=0, max_value=255, value=128)
 
-    st.divider()
-    st.subheader("4. Historial")
-    col_hist_1, col_hist_2, col_hist_3 = st.columns(3)
-    with col_hist_1:
-        if st.button("Aplicar", use_container_width=True):
-            proc = st.session_state.processor
-            if aplicar_brillo:
-                proc.ajustar_brillo(brillo)
-            if aplicar_contraste:
-                proc.contraste(contraste)
-            if aplicar_saturacion:
-                proc.saturacion(saturacion)
-            if aplicar_umbral:
-                proc.umbralizacion(int(umbral))
-            if aplicar_redimension:
-                proc.redimensionar(int(ancho), int(alto))
-            if aplicar_marca and logo_file is not None:
-                logo_path = st.session_state.temp_dir / logo_file.name
-                logo_path.write_bytes(logo_file.getbuffer())
-                proc.aplicar_marca_agua(
-                    ruta_logo=logo_path,
-                    opacidad=float(opacidad),
-                    escala=float(escala),
-                )
-            st.session_state.current_image = proc.imagen_procesada.copy()
-            st.success("Transformaciones aplicadas")
-    with col_hist_2:
-        if st.button("Deshacer", use_container_width=True):
-            proc = st.session_state.processor
-            proc.deshacer()
-            st.session_state.current_image = proc.imagen_procesada.copy()
-    with col_hist_3:
-        if st.button("Rehacer", use_container_width=True):
-            proc = st.session_state.processor
-            proc.rehacer()
-            st.session_state.current_image = proc.imagen_procesada.copy()
+if st.session_state.processor is None:
+    st.info("Carga una imagen desde la barra lateral para comenzar.")
+    st.stop()
 
-    if st.button("Restablecer", use_container_width=True):
+st.session_state.aplicar_brillo = aplicar_brillo
+st.session_state.aplicar_contraste = aplicar_contraste
+st.session_state.aplicar_saturacion = aplicar_saturacion
+st.session_state.aplicar_umbral = aplicar_umbral
+st.session_state.aplicar_redimension = aplicar_redimension
+st.session_state.logo_file = logo_file
+st.session_state.opacidad = opacidad
+st.session_state.escala = escala
+
+st.markdown('<div class="toolbar">', unsafe_allow_html=True)
+toolbar_cols = st.columns([1.2, 1.0, 1.0, 1.0, 1.2], gap="small")
+with toolbar_cols[0]:
+    if st.button("✓ Aplicar", use_container_width=True):
         proc = st.session_state.processor
-        proc.resetear()
-        st.session_state.current_image = proc.imagen_procesada.copy()
+        if st.session_state.aplicar_brillo:
+            proc.ajustar_brillo(brillo)
+        if st.session_state.aplicar_contraste:
+            proc.contraste(contraste)
+        if st.session_state.aplicar_saturacion:
+            proc.saturacion(saturacion)
+        if st.session_state.aplicar_umbral:
+            proc.umbralizacion(int(umbral))
+        if st.session_state.aplicar_redimension:
+            proc.redimensionar(int(ancho), int(alto))
+        if aplicar_marca and st.session_state.logo_file is not None:
+            logo_path = st.session_state.temp_dir / st.session_state.logo_file.name
+            logo_path.write_bytes(st.session_state.logo_file.getbuffer())
+            proc.aplicar_marca_agua(
+                ruta_logo=logo_path,
+                opacidad=float(st.session_state.opacidad),
+                escala=float(st.session_state.escala),
+            )
 
-main_col_left, main_col_right = st.columns(2)
-with main_col_left:
-    st.markdown('<div class="status-card"><strong>Original</strong></div>', unsafe_allow_html=True)
+        st.session_state.current_image = proc.imagen_procesada.copy()
+        st.session_state.last_action = "Transformaciones aplicadas"
+with toolbar_cols[1]:
+    if st.button("↺ Deshacer", use_container_width=True):
+        st.session_state.processor.deshacer()
+        st.session_state.current_image = st.session_state.processor.imagen_procesada.copy()
+        st.session_state.last_action = "Deshacer"
+with toolbar_cols[2]:
+    if st.button("↻ Rehacer", use_container_width=True):
+        st.session_state.processor.rehacer()
+        st.session_state.current_image = st.session_state.processor.imagen_procesada.copy()
+        st.session_state.last_action = "Rehacer"
+with toolbar_cols[3]:
+    if st.button("⟳ Reset", use_container_width=True):
+        st.session_state.processor.resetear()
+        st.session_state.current_image = st.session_state.processor.imagen_procesada.copy()
+        st.session_state.last_action = "Restablecido"
+with toolbar_cols[4]:
+    if st.button("⬇ Descargar", use_container_width=True):
+        st.session_state.last_action = "Descarga lista"
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.caption(st.session_state.last_action)
+
+preview_col, info_col = st.columns([2, 1])
+with preview_col:
+    st.markdown('<div class="preview-card"><strong>Original</strong></div>', unsafe_allow_html=True)
     st.image(st.session_state.original_image, width="stretch")
-with main_col_right:
-    st.markdown('<div class="status-card"><strong>Vista previa actual</strong></div>', unsafe_allow_html=True)
+with info_col:
+    st.markdown('<div class="preview-card"><strong>Vista previa actual</strong></div>', unsafe_allow_html=True)
     st.image(st.session_state.current_image, width="stretch")
 
 buffer = BytesIO()
 st.session_state.current_image.save(buffer, format="PNG")
 st.download_button(
-    label="Descargar imagen procesada",
+    label="Guardar PNG",
     data=buffer.getvalue(),
     file_name="imagen_procesada.png",
     mime="image/png",
